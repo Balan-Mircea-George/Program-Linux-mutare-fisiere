@@ -1,0 +1,134 @@
+#Program care cauta si muta fisiere sau subdirectoare ale directoarelor din directorul curent in oricare alt director. 
+#E nevoie de trei argumente (director de mutat) (director de cautat) (fisier), insa se poate si (director de mutat) (fisier), caz in care se cauta fisierul in directorul curent si dubdirectoarele sale
+#Daca directorul de mutat(adica in care se muta) nu e scris corect sau nu exista problema nu merge mai departe. Daca directorul de cautat(in care se cauta) nu e scris corect sau nu exista
+#se va folosi directorul curent drept director de cautare. Daca fisierul nu se afla in directorul de cautat, dar exista, se va specifica utilizatorului unde se afla.
+
+#!/bin/bash
+if [ $# -eq 0 ]
+then
+	echo "Nu exista argumente, si ar trebui, adica *.sh (director de mutat) (director de cautat) (fisier)."
+	exit
+fi
+if [ $# -gt 3 ] 
+then
+	echo "Prea multi parametrii, ar trebui sa fie asa: *.sh (director de mutat) (director de cautat) (fisier)."
+	exit
+fi	
+if [ $# -eq 2 ] 
+then
+	if [ -d $1 ]
+	then
+	dirm=$1
+	else
+	dirm=`find -type d -name "$1"`
+	fi
+	if [ -d "$2" ]
+	then
+	echo "Ati tastat doua directoare, ar trebui sa fie asa: *.sh (director de mutat) (director de cautat) (fisier) sau *.sh (director de mutat) (fisier) si la a 2-a varianta se va cauta in directorul curent. Altfel daca as elimina acest if care verifica ca al 2-lea argument e director as putea sa mut si directoare nu numai fisiere, insa am dorit ca programul sa se ocupe strict de fisiere."
+	exit
+	else
+	echo "Se considera ca ati tastat doar directorul unde vreti ca fisierul sa fie mutat si fisierul. In acest caz se va cauta fisierul in directorul curent."
+	dir=`pwd`
+	fis=$2
+	if [ -d "$dirm" ]
+	then 
+	echo "Directorul de mutare e bun."
+	else
+	echo "Directorul de mutare ne e valid. Poate ati scris gresit?"
+	exit
+	fi
+	echo "Directorul de mutare e $dirm, directorul de cautare e in $dir si fisierul in cauza e $fis."
+	fis=`find "$dir" -name "$2"`
+if [ -e "$fis" ]
+then
+	echo "Fisierul $2 era in `find "$dir" -name "$2"`"
+	mv "$fis" "$dirm"
+	if [ -d "$1" ]
+	then
+	echo "Acum $2 este in `find ./"$dirm" -name "$2"`"
+	else
+	echo "Acum $2 este in `find "$dirm" -name "$2"`"
+	fi
+else
+	ver=`find -type f -name "$2"`
+	if [ -e "$ver" ]
+	then
+	echo "Fisierul introdus exista, dar nu in directorul curent. Fisierul $2 se afla in `find -type f -name "$2"`"
+	else
+	echo "Fisierul introdus nu e valid. Poate ati scris gresit?"
+	fi
+	fi
+fi
+fi
+if [ $# -eq 3 ]
+then
+	if [ -d $3 ]
+	then
+	echo "Ati tastat trei directoare, ar trebui sa fie asa: *.sh (director de mutat) (director de cautat) (fisier) sau *.sh (director de mutat) (fisier) si la a 2-a varianta se va cauta in directorul curent. Altfel daca as elimina acest if care verifica ca al 3-lea argument e director as putea sa mut si directoare nu numai fisiere, insa am dorit ca programul sa se ocupe strict de fisiere."
+	exit
+	else
+	if [ -d $1 ]
+	then
+	dirm=$1
+	else
+	dirm=`find -type d -name "$1"`
+	fi
+	if [ -d $2 ]
+	then
+	dir=$2
+	else
+	dir=`find -type d -name "$2"`
+	fi
+	fis=$3
+	if [ -d "$dir" ]
+	then
+	echo "Directorul de cautare e bun."
+	else
+		dir=`pwd`
+		echo "Directorul de cautare nu e valid. Se incepe cautarea in directorul curent"
+	fi
+	if [ -d "$dirm" ]
+	then
+	echo "Directorul de mutare e bun."
+	else
+	echo "Directorul de mutare nu e valid. Poate ati scris gresit?"
+	exit
+	fi
+	echo "Directorul de mutare e $dirm, directorul de cautare e $dir si fisierul in cauza e $fis."
+	if [ "$dir"=`pwd` ]
+	then
+	fis=`find "$dir" -name "$3"`
+	else
+	fis=`find ./"$dir" -name "$3"`
+	fi
+if [ -e "$fis" ]
+then
+	if [ "$dir"=`pwd` ]
+	then
+	echo "Fisierul $3 era in `find "$dir" -name "$3"`"
+	else
+	if [ -d "$2" ]
+	then
+	echo "Fisierul $3 era in `find ./"$dir" -name "$3"`"
+	else
+	echo "Fisierul $3 era in `find "$dir" -name "$3"`"
+	fi
+	fi
+	mv "$fis" "$dirm"
+	if [ -d "$1" ]
+	then
+	echo "Fisierul $3 este in `find ./"$dirm" -name "$3"`"
+	else
+	echo "Fisierul $3 este in `find "$dirm" -name "$3"`"
+	fi
+else
+	ver=`find -type f -name "$3"`
+	if [ -e "$ver" ]
+	then
+	echo "Fisierul introdus exista, dar nu unde ati specificat. Fisierul $3 se afla in `find -type f -name "$3"`"
+	else
+	echo "Fisierul introdus nu e valid. Poate ati scris gresit?"
+	fi
+fi
+fi
+fi
